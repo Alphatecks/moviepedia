@@ -20,3 +20,4 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 });
 
 Route::post('/create_user', [UserAuthController::class, 'user_signup']);
+Route::post('/verify_otp',[UserAuthController::class,'user_verification']);

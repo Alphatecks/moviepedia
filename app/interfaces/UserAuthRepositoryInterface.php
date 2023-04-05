@@ -7,4 +7,5 @@ namespace App\interfaces;
 interface UserAuthRepositoryInterface
 {
     public function user_signup(array $user);
+    public function user_verify(int $userId);
 }

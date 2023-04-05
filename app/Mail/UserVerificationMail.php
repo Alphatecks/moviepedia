@@ -17,9 +17,12 @@ class UserVerificationMail extends Mailable
      *
      * @return void
      */
-    public function __construct()
+    public $subject;
+    public $message;
+    public function __construct($subject, $message)
     {
-        //
+        $this->subject = $subject;
+        $this->message = $message;
     }
 
     /**
@@ -30,7 +33,7 @@ class UserVerificationMail extends Mailable
     public function envelope()
     {
         return new Envelope(
-            subject:'User Verification Mail',
+            subject:'{$this->subject}',
         );
     }
 
