@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers\Auth;
 
+use App\Custom\MailMessages;
 use App\Http\Controllers\Controller;
 use App\interfaces\OTPRepositoryInterface;
 use App\interfaces\UserAuthRepositoryInterface;
+use App\Mail\UserVerificationMail;
 use Illuminate\Http\Request;
 use Str;
 use Validator;
@@ -39,15 +41,15 @@ class UserAuthController extends Controller
 
             $user = $this->userAuthRepo->user_signup($validator->validated());
 
-            $random = Str::random(5);
+            $random = Str::random(6);
 
             $otp = $this->otpRepo->create_otp(["token" => $random, "user_id" => $user->id]);
 
             #send mail
 
-            //   MailMessages::UserVerificationMail($request->email, $random);
+            MailMessages::UserVerificationMail($request->email, $random);
 
-            return response(["code" => 1, "message" => "User created successfully", "{$random}"]);
+            return response(["code" => 1, "message" => "User created successfully"], 201);
 
         } catch (\Throwable$th) {
             return response(["code" => 3, "error" => $th->getMessage()]);
@@ -132,23 +134,54 @@ class UserAuthController extends Controller
                 ], 401);
             }
         } catch (\Throwable$th) {
-            return response(["code"=>3,"error"=>$th->getMessage()]);
+            return response(["code" => 3, "error" => $th->getMessage()]);
         }
     }
 
     public function user_forget_password(Request $request)
     {
+        try {
+            $validator = Validator::make($request->all(), [
+                'email' => 'required|email|exists:users',
+            ]);
 
+            if ($validator->fails()) {
+                return response()->json(["code" => 3, 'error' => $validator->errors()], 401);
+            }
+
+            $email_exists = $this->userAuthRepo->email_exists($request->email);
+
+            if ($email_exists == null) {
+                return response(["code" => 3, "message" => "email does not exist"], 401);
+            }
+
+            $random = Str::random(6);
+
+            $this->userAuthRepo->save_forget_password_details(["email" => $request->email, "token" => $random]);
+
+            #send mail
+
+        } catch (\Throwable$th) {
+            return response(["code" => 3, "error" => $th->getMessage()]);
+        }
     }
 
     public function user_reset_password(Request $request)
     {
-
+        try {
+            //code...
+        } catch (\Throwable$th) {
+            return response(["code" => 3, "error" => $th->getMessage()]);
+        }
     }
 
     public function login(Request $request)
     {
-
+        try {
+            //code...
+        } catch (\Throwable$th) {
+            return response(["code" => 3, "error" => $th->getMessage()]);
+        }
     }
 
 }

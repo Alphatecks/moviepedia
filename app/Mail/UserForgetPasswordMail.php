@@ -8,7 +8,7 @@ use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 
-class UserVerificationMail extends Mailable
+class UserForgetPasswordMail extends Mailable
 {
     use Queueable, SerializesModels;
 
@@ -17,12 +17,9 @@ class UserVerificationMail extends Mailable
      *
      * @return void
      */
-
-     public $mailData;
-
     public function __construct($mailData)
     {
-       $this->mailData = $mailData;
+        $this->mailData = $mailData;
     }
 
     /**
@@ -33,7 +30,7 @@ class UserVerificationMail extends Mailable
     public function envelope()
     {
         return new Envelope(
-            subject:'User Verification Mail',
+            subject:'User Forget Password',
         );
     }
 
@@ -45,7 +42,7 @@ class UserVerificationMail extends Mailable
     public function content()
     {
         return new Content(
-            view:'mail.userverificationmail'
+            view:'mail.userforgetpasswordmail',
         );
     }
 
