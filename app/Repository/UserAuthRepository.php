@@ -41,4 +41,25 @@ class UserAuthRepository implements UserAuthRepositoryInterface
             'created_at' => Carbon::now(),
         ]);
     }
+
+    public function update_password(array $data)
+    {
+        $updatePassword = DB::table('password_resets')
+            ->where([
+                'email' => $data['email'],
+                'token' => $data['token'],
+            ])
+            ->get();
+
+        if ($updatePassword->count() > 0) {
+            $user = User::where('email', $data['email'])->update(['password' => Hash::make($data['password'])]);
+            DB::table('password_resets')->where(['email' => $data['email']])->delete();
+        }
+    }
+
+    public function is_user_active(string $email)
+    {
+        # for active users
+        return User::where('email', $email)->where('status', 'active')->where('email_verified', "!=", null)->first();
+    }
 }

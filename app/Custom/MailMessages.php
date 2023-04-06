@@ -24,7 +24,12 @@ class MailMessages
     public static function UserForgetPasswordMail(string $email, string $token)
     {
         $subject = "Forget Password Notification";
-        $message = "Below is the OTP for your password reset";
+        $message = `Below is the OTP for your password reset.
+
+        Kindly ignore if this mail isn't from you.
+
+        Thank you.`;
+        
         $OTP = "OTP: {$token}";
         $mailData = ["subject" => $subject, "message" => $message, "token" => $token];
 

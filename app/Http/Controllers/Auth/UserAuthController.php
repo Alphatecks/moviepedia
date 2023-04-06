@@ -71,7 +71,7 @@ class UserAuthController extends Controller
             $token_exists = $this->otpRepo->find_token($request->verify_token);
 
             if ($token_exists->count() == 0) {
-                return response(["code" => 3, "The provided token does not exist"]);
+                return response(["code" => 3, "The provided token does not exist"], 401);
             }
 
             $update_user_verification = $this->userAuthRepo->user_verify($token_exists->user_id);
@@ -161,6 +161,8 @@ class UserAuthController extends Controller
 
             #send mail
 
+            MailMessages::UserForgetPasswordMail($request->email, $random);
+
         } catch (\Throwable$th) {
             return response(["code" => 3, "error" => $th->getMessage()]);
         }
@@ -169,7 +171,21 @@ class UserAuthController extends Controller
     public function user_reset_password(Request $request)
     {
         try {
-            //code...
+            $validator = Validator::make($request->all(), [
+                'token' => 'required',
+                'email' => 'required',
+                'password' => 'required|string|min:6',
+            ]);
+
+            if ($validator->fails()) {
+                return response()->json(['code' => 3, 'error' => $validator->errors()], 401);
+            }
+
+            $update_password = $this->userAuthRepo->update_password($validator->validated());
+
+            if ($update_password) {
+                return response(["code" => 1, "message" => "Password reset successfull"]);
+            }
         } catch (\Throwable$th) {
             return response(["code" => 3, "error" => $th->getMessage()]);
         }
@@ -178,7 +194,35 @@ class UserAuthController extends Controller
     public function login(Request $request)
     {
         try {
-            //code...
+            $validator = Validator::make($request->all(), [
+                'email' => 'required',
+                'password' => 'required',
+            ]);
+
+            if ($validator->fails()) {
+                return response()->json(["code" => 3, 'error' => $validator->errors()], 401);
+            }
+
+            if (!auth()->attempt($request->only(['email', 'password']))) {
+                return response()->json(["code" => 3, "error" => "Invalid email or passsword"], 401);
+            }
+
+            $user = $this->userAuthRepo->is_user_active($request->email);
+
+            if ($user) {
+                $status = 200;
+
+                $response = [
+                    'type' => 'user',
+                    // 'user_auth_type' => ($user->password != null) ? 'main' : 'google',
+                    'user' => auth()->user(),
+                    'token' => auth()->user()->createToken('auth_token')->plainTextToken,
+                ];
+                return response()->json($response, $status);
+            } else {
+                return response()->json(["code" => 3, 'message' => "No user with that email or Account has not been verified"], 401);
+            }
+
         } catch (\Throwable$th) {
             return response(["code" => 3, "error" => $th->getMessage()]);
         }
