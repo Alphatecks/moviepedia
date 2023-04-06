@@ -196,6 +196,8 @@ return [
         App\Providers\RouteServiceProvider::class,
         App\Providers\RepositoryProvider\UserAuthRepositoryProvider::class,
         App\Providers\RepositoryProvider\OTPRepositoryProvider::class,
+        App\Providers\RepositoryProvider\MoviesGenreRepositoryProvider::class,
+        App\Providers\RepositoryProvider\MoviesRepositoryProvider::class,
 
     ],
 
