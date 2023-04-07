@@ -8,6 +8,7 @@ use App\interfaces\OTPRepositoryInterface;
 use App\interfaces\UserAuthRepositoryInterface;
 use App\Mail\UserVerificationMail;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 use Str;
 use Validator;
 
@@ -70,8 +71,8 @@ class UserAuthController extends Controller
 
             $token_exists = $this->otpRepo->find_token($request->verify_token);
 
-            if ($token_exists->count() == 0) {
-                return response(["code" => 3, "The provided token does not exist"], 401);
+            if ($token_exists == null) {
+                return response(["code" => 3, "message" => "The provided token does not exist"], 401);
             }
 
             $update_user_verification = $this->userAuthRepo->user_verify($token_exists->user_id);
@@ -80,7 +81,7 @@ class UserAuthController extends Controller
                 $this->otpRepo->delete_token($token_exists->id);
             }
 
-            return response([""]);
+            return response(["code" => 1, "message" => "user verification successful"]);
 
         } catch (\Throwable$th) {
             return response(["code" => 3, "error" => $th->getMessage()]);
@@ -111,9 +112,9 @@ class UserAuthController extends Controller
                         # return success message after updating
                         return response()->json([
                             'code' => 1,
-                            'data' => [
-                                'message' => 'password changed.',
-                            ],
+
+                            'message' => 'password changed.',
+
                         ]);
                     } else {
                         return response()->json([
@@ -163,7 +164,10 @@ class UserAuthController extends Controller
 
             MailMessages::UserForgetPasswordMail($request->email, $random);
 
+            return response(["code" => 1, "message" => "email successfully sent"]);
+
         } catch (\Throwable$th) {
+            return $th;
             return response(["code" => 3, "error" => $th->getMessage()]);
         }
     }
@@ -183,9 +187,8 @@ class UserAuthController extends Controller
 
             $update_password = $this->userAuthRepo->update_password($validator->validated());
 
-            if ($update_password) {
-                return response(["code" => 1, "message" => "Password reset successfull"]);
-            }
+            return response(["code" => 1, "message" => "Password reset successfull"]);
+
         } catch (\Throwable$th) {
             return response(["code" => 3, "error" => $th->getMessage()]);
         }
@@ -195,7 +198,7 @@ class UserAuthController extends Controller
     {
         try {
             $validator = Validator::make($request->all(), [
-                'email' => 'required',
+                'email' => 'required|email',
                 'password' => 'required',
             ]);
 

@@ -17,6 +17,7 @@ class UserForgetPasswordMail extends Mailable
      *
      * @return void
      */
+    public $mailData;
     public function __construct($mailData)
     {
         $this->mailData = $mailData;

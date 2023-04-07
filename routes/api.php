@@ -1,8 +1,8 @@
 <?php
 
+use App\Http\Controllers\Auth\UserAuthController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Auth\UserAuthController;
 
 /*
 |--------------------------------------------------------------------------
@@ -20,4 +20,12 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 });
 
 Route::post('/create_user', [UserAuthController::class, 'user_signup']);
-Route::post('/verify_otp',[UserAuthController::class,'user_verification']);
+Route::post('/verify_otp', [UserAuthController::class, 'user_verification']);
+Route::post('/forget_password', [UserAuthController::class, 'user_forget_password']);
+Route::post('/reset_password', [UserAuthController::class, 'user_reset_password']);
+Route::post('/login', [UserAuthController::class, 'login']);
+
+
+Route::group(['middleware' => ['auth:sanctum']], function () {
+    Route::post('/change_password', [UserAuthController::class, 'user_change_password']);
+});

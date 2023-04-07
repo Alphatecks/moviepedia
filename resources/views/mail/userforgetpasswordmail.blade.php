@@ -3,9 +3,10 @@
 
 <body>
     <h1>{{ $mailData['subject'] }}</h1>
+
     <p>{{ $mailData['message'] }}</p>
 
-     <p> {{$mailData['OTP']}} </p>
+     <p> {{$mailData['token']}} </p>
 
     <p>Thank you</p>
 </body>

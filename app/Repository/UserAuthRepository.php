@@ -60,6 +60,6 @@ class UserAuthRepository implements UserAuthRepositoryInterface
     public function is_user_active(string $email)
     {
         # for active users
-        return User::where('email', $email)->where('status', 'active')->where('email_verified', "!=", null)->first();
+        return User::where('email', $email)->where('status', 'active')->where('email_verified_at', "!=", null)->first();
     }
 }
