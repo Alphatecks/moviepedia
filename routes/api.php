@@ -25,7 +25,15 @@ Route::post('/forget_password', [UserAuthController::class, 'user_forget_passwor
 Route::post('/reset_password', [UserAuthController::class, 'user_reset_password']);
 Route::post('/login', [UserAuthController::class, 'login']);
 
-
 Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::post('/change_password', [UserAuthController::class, 'user_change_password']);
+});
+
+require __DIR__ . '/admin.php';
+
+Route::fallback(function () {
+    return response()->json([
+        'code' => 404,
+        'message' => 'Route Not Found',
+    ], 404);
 });

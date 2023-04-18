@@ -198,6 +198,7 @@ return [
         App\Providers\RepositoryProvider\OTPRepositoryProvider::class,
         App\Providers\RepositoryProvider\MoviesGenreRepositoryProvider::class,
         App\Providers\RepositoryProvider\MoviesRepositoryProvider::class,
+        App\Providers\RepositoryProvider\AdminAuthRepositoryProvider::class,
 
     ],
 

@@ -167,7 +167,7 @@ class UserAuthController extends Controller
             return response(["code" => 1, "message" => "email successfully sent"]);
 
         } catch (\Throwable$th) {
-            return $th;
+         
             return response(["code" => 3, "error" => $th->getMessage()]);
         }
     }

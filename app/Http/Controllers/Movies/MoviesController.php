@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers\Movies;
 
-use Validator;
-use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\interfaces\MovieRepositoryInterface;
+use Illuminate\Http\Request;
+use Validator;
 
 class MoviesController extends Controller
 {
@@ -30,14 +30,27 @@ class MoviesController extends Controller
                 return response()->json(["code" => 3, 'error' => $validator->errors()], 401);
             }
 
-
-
         } catch (\Throwable$th) {
             //throw $th;
         }
     }
 
-    public function get_all_movies(Request $request)
+    public function get_all_movies()
+    {
+
+    }
+
+    public function get_single_movie($id)
+    {
+
+    }
+
+    public function edit_movie(Request $request, $id)
+    {
+
+    }
+
+    public function delete_movie($id)
     {
 
     }
