@@ -16,9 +16,10 @@ return new class extends Migration
         Schema::create('movies', function (Blueprint $table) {
             $table->increments('id');
             $table->string('movie_name');
-            $table->foreignId('genre_id')->index();
+            $table->unsignedInteger('genre_id')->foreignId()->index();
             $table->text('details')->nullable();
             $table->string('status')->default('active');
+            $table->softDeletes();
             $table->timestamps();
         });
     }

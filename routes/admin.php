@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Movies\MoviesController;
+use App\Http\Controllers\Auth\AdminAuthController;
 use App\Http\Controllers\Movies\MoviesGnereController;
 
 Route::prefix('admin_restricted')->group(function () {
@@ -18,8 +19,11 @@ Route::prefix('admin_restricted')->group(function () {
         });
 
         Route::controller(MoviesController::class)->group(function () {
-            Route::post('/create_movies', 'create_movies');
-            Route::get('/get_all_movies','');
+            Route::post('/create_movie', 'create_movies');
+            Route::get('/get_all_movies', 'get_all_movies');
+            Route::get('/get_single_movie/{id}', 'get_single_movie');
+            Route::put('/edit_movie/{id}', 'edit_movie');
+            Route::delete('/delete_movie/{id}', 'delete_movie');
         });
 
     });

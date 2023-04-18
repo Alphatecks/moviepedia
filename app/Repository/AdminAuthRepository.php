@@ -10,7 +10,7 @@ use App\interfaces\AdminAuthRepositoryInterface;
 
 class AdminAuthRepository implements AdminAuthRepositoryInterface{
     public function login(array $data){}
-    public function ChangePassword(array $data);
+    public function ChangePassword(array $data){}
 
 
     public function forgotPassword(array $data){
