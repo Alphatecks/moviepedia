@@ -30,6 +30,6 @@ class MovieGenreRepository implements MovieGenreRepositoryInterface
     }
     public function delete_movie_genre($id)
     {
-        return MovieGenre->find($id)->delete();
+        return MovieGenre::find($id)->delete();
     }
 }

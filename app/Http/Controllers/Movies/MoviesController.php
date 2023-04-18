@@ -2,13 +2,17 @@
 
 namespace App\Http\Controllers\Movies;
 
+use Validator;
+use Illuminate\Http\Request;
+use App\Custom\ApiResponseTrait;
 use App\Http\Controllers\Controller;
 use App\interfaces\MovieRepositoryInterface;
-use Illuminate\Http\Request;
-use Validator;
 
 class MoviesController extends Controller
 {
+
+    use ApiResponseTrait;
+
 
     private $movieRepo;
 
@@ -27,7 +31,7 @@ class MoviesController extends Controller
             ]);
 
             if ($validator->fails()) {
-                return response()->json(["code" => 3, 'error' => $validator->errors()], 401);
+                return $this->error($validator->errors(), 401);
             }
 
         } catch (\Throwable$th) {
@@ -37,7 +41,11 @@ class MoviesController extends Controller
 
     public function get_all_movies()
     {
+      try {
 
+      } catch (\Throwable $th) {
+        //throw $th;
+      }
     }
 
     public function get_single_movie($id)

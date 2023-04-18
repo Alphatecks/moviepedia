@@ -15,7 +15,7 @@ return new class extends Migration
     {
         Schema::create('movie_genres', function (Blueprint $table) {
             $table->increments('id');
-            $table->string('genres');
+            $table->string('genre');
             $table->string('status')->default('active');
             $table->timestamps();
             $table->softDeletes();

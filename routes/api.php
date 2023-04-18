@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Auth\UserAuthController;
+use App\Http\Controllers\Movies\MoviesController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -24,6 +25,14 @@ Route::post('/verify_otp', [UserAuthController::class, 'user_verification']);
 Route::post('/forget_password', [UserAuthController::class, 'user_forget_password']);
 Route::post('/reset_password', [UserAuthController::class, 'user_reset_password']);
 Route::post('/login', [UserAuthController::class, 'login']);
+
+Route::controller(MoviesController::class)->group(function () {
+    Route::post('/create_movie', 'create_movies');
+    Route::get('/get_all_movies', 'get_all_movies');
+    Route::get('/get_single_movie/{id}', 'get_single_movie');
+    Route::put('/edit_movie/{id}', 'edit_movie');
+    Route::delete('/delete_movie/{id}', 'delete_movie');
+});
 
 Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::post('/change_password', [UserAuthController::class, 'user_change_password']);
