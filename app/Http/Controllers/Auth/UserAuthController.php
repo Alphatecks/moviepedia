@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Auth;
 
+use App\Custom\ApiResponseTrait;
 use App\Custom\MailMessages;
 use App\Http\Controllers\Controller;
 use App\interfaces\OTPRepositoryInterface;
@@ -14,6 +15,8 @@ use Validator;
 
 class UserAuthController extends Controller
 {
+
+    use ApiResponseTrait;
 
     private $userAuthRepo;
     private $otpRepo;
@@ -37,7 +40,7 @@ class UserAuthController extends Controller
             ]);
 
             if ($validator->fails()) {
-                return response()->json(["code" => 3, 'error' => $validator->errors()], 401);
+                return $this->error($validator->errors(), 401);
             }
 
             $user = $this->userAuthRepo->user_signup($validator->validated());
@@ -50,10 +53,9 @@ class UserAuthController extends Controller
 
             MailMessages::UserVerificationMail($request->email, $random);
 
-            return response(["code" => 1, "message" => "User created successfully"], 201);
-
+            return $this->success("User created successfully");
         } catch (\Throwable$th) {
-            return response(["code" => 3, "error" => $th->getMessage()]);
+            return $this->error($th->getMessage(), 400);
         }
     }
 
@@ -66,13 +68,13 @@ class UserAuthController extends Controller
             ]);
 
             if ($validator->fails()) {
-                return response()->json(["code" => 3, 'error' => $validator->errors()], 401);
+                return $this->error($validator->errors(), 401);
             }
 
             $token_exists = $this->otpRepo->find_token($request->verify_token);
 
             if ($token_exists == null) {
-                return response(["code" => 3, "message" => "The provided token does not exist"], 401);
+                return $this->error("The token doesn't exist", 401);
             }
 
             $update_user_verification = $this->userAuthRepo->user_verify($token_exists->user_id);
@@ -81,10 +83,10 @@ class UserAuthController extends Controller
                 $this->otpRepo->delete_token($token_exists->id);
             }
 
-            return response(["code" => 1, "message" => "user verification successful"]);
+            return $this->success("user verification successful");
 
         } catch (\Throwable$th) {
-            return response(["code" => 3, "error" => $th->getMessage()]);
+            return $this->error($th->getMessage(), 400);
         }
     }
 
@@ -100,7 +102,7 @@ class UserAuthController extends Controller
             # check if validation fails
             if ($validator->fails()) {
                 # return validation error
-                return response()->json(["code" => 3, 'error' => $validator->errors()], 401);
+                return $this->error($validator->errors(), 401);
             }
             # check if the user is authenticated
             if (auth()->user()) {
@@ -110,32 +112,18 @@ class UserAuthController extends Controller
                         # update the new password
                         auth()->user()->update(['password' => Hash::make(request('password'))]);
                         # return success message after updating
-                        return response()->json([
-                            'code' => 1,
-
-                            'message' => 'password changed.',
-
-                        ]);
+                        return $this->success("Password update successful");
                     } else {
-                        return response()->json([
-                            'code' => 3,
-                            'message' => 'password mismatch',
-                        ]);
+                        return $this->error("password mismatch", 401);
                     }
                 } catch (\Throwable$e) {
-                    return response()->json([
-                        'code' => 3,
-                        'error ' => $e->getMessage(),
-                    ], 500);
+                    return $this->error($th->getMessage(), 400);
                 }
             } else {
-                return response()->json([
-                    'code' => 3,
-                    'message' => 'unauthenticated user',
-                ], 401);
+                return $this->error("Unauthenticated user", 400);
             }
         } catch (\Throwable$th) {
-            return response(["code" => 3, "error" => $th->getMessage()]);
+            return $this->error($th->getMessage(), 400);
         }
     }
 
@@ -147,13 +135,13 @@ class UserAuthController extends Controller
             ]);
 
             if ($validator->fails()) {
-                return response()->json(["code" => 3, 'error' => $validator->errors()], 401);
+                return $this->error($validator->errors(), 401);
             }
 
             $email_exists = $this->userAuthRepo->email_exists($request->email);
 
             if ($email_exists == null) {
-                return response(["code" => 3, "message" => "email does not exist"], 401);
+                return $this->error("Email does not exist", 401);
             }
 
             $random = Str::random(6);
@@ -164,11 +152,10 @@ class UserAuthController extends Controller
 
             MailMessages::UserForgetPasswordMail($request->email, $random);
 
-            return response(["code" => 1, "message" => "email successfully sent"]);
-
+            return $this->success("email sent successfully", 201);
         } catch (\Throwable$th) {
-         
-            return response(["code" => 3, "error" => $th->getMessage()]);
+
+            return $this->error($th->getMessage(), 400);
         }
     }
 
@@ -182,15 +169,15 @@ class UserAuthController extends Controller
             ]);
 
             if ($validator->fails()) {
-                return response()->json(['code' => 3, 'error' => $validator->errors()], 401);
+                return $this->error($validator->errors(), 401);
             }
 
             $update_password = $this->userAuthRepo->update_password($validator->validated());
 
-            return response(["code" => 1, "message" => "Password reset successfull"]);
+            return $this->success("Password reset successful");
 
         } catch (\Throwable$th) {
-            return response(["code" => 3, "error" => $th->getMessage()]);
+            return $this->error($th->getMessage(), 400);
         }
     }
 
@@ -203,11 +190,11 @@ class UserAuthController extends Controller
             ]);
 
             if ($validator->fails()) {
-                return response()->json(["code" => 3, 'error' => $validator->errors()], 401);
+                return $this->error($validator->errors(), 401);
             }
 
             if (!auth()->attempt($request->only(['email', 'password']))) {
-                return response()->json(["code" => 3, "error" => "Invalid email or passsword"], 401);
+                return $this->error("Invalid email or password", 401);
             }
 
             $user = $this->userAuthRepo->is_user_active($request->email);
@@ -221,13 +208,13 @@ class UserAuthController extends Controller
                     'user' => auth()->user(),
                     'token' => auth()->user()->createToken('auth_token')->plainTextToken,
                 ];
-                return response()->json($response, $status);
+                return $this->success("Login successful", $response);
             } else {
-                return response()->json(["code" => 3, 'message' => "No user with that email or Account has not been verified"], 401);
+                return $this->error("No user with this email OR account is yet to be verified", 400);
             }
 
         } catch (\Throwable$th) {
-            return response(["code" => 3, "error" => $th->getMessage()]);
+            return $this->error($th->getMessage(), 400);
         }
     }
 
