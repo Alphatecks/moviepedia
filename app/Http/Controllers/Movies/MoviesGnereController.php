@@ -58,11 +58,12 @@ class MoviesGnereController extends Controller
 
     }
 
-    public function delete_movie_genre($id){
+    public function delete_movie_genre($id)
+    {
         try {
             $movie_genre = $this->movieGenreRepo->delete_movie_genre($id);
             return $this->success("Genre deleted successfully");
-        } catch (\Throwable $th) {
+        } catch (\Throwable$th) {
             return $this->error($th->getMessage(), 400);
         }
     }
